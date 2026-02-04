@@ -14,8 +14,6 @@ venv/
 data/raw/
 data/processed/
 
-# Generated outputs
-outputs/
 
 # IDE
 .vscode/
@@ -26,4 +24,6 @@ outputs/
 
 # data files
 data/
+
+
 

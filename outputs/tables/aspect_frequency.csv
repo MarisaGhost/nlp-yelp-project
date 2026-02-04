@@ -1,0 +1,7 @@
+split,aspect,mention_rate,total_mentions
+positive,Food,85.4260349879602,209456
+positive,Service,64.0038875511329,104851
+positive,Price,37.72520235573994,43263
+negative,Food,78.69046946500198,49918
+negative,Service,75.19914129145246,46073
+negative,Price,43.73764194113327,15373

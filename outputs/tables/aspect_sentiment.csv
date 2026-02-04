@@ -1,0 +1,7 @@
+split,aspect,mean_compound,num_reviews_with_aspect
+positive,Food,0.8912801141091169,58891
+positive,Service,0.9090945493280148,44123
+positive,Price,0.9101735186680509,26007
+negative,Food,0.3134519348122622,13929
+negative,Service,0.26001646758320185,13311
+negative,Price,0.36438298889175924,7742
