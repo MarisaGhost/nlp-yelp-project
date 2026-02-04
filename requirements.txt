@@ -1,0 +1,13 @@
+pandas>=1.5
+numpy>=1.21
+
+scikit-learn>=1.2
+gensim>=4.3
+
+spacy>=3.6
+nltk>=3.8
+
+matplotlib>=3.7
+seaborn>=0.12
+
+tqdm>=4.65

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Environments
+.env
+.venv
+venv/
+
+# Data (do not upload Yelp data)
+data/raw/
+data/processed/
+
+# Generated outputs
+outputs/
+
+# IDE
+.vscode/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# data files
+data/
+
