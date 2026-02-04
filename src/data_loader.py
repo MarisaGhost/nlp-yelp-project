@@ -25,22 +25,15 @@ if __name__ == "__main__":
 
     # Step 2: Filter to Philadelphia restaurants
     # Conditions:
-    # - city == "Philadelphia" (case-insensitive)
+    # - city is exactly "Philadelphia"
     # - categories contains "Restaurants"
-    filtered_businesses = []
+    restaurant_names = {}
     for business in businesses:
-        city = str(business.get("city", "")).strip().lower()
+        city = str(business.get("city", "")).strip()
         categories = str(business.get("categories", "") or "")
-        if city == "philadelphia" and "Restaurants" in categories:
-            filtered_businesses.append(business)
-
-    # Step 3: Build dictionary: business_id -> business_name
-    business_id_to_name = {}
-    for business in filtered_businesses:
         business_id = business.get("business_id")
-        business_name = business.get("name", "")
-        if business_id:
-            business_id_to_name[business_id] = business_name
+        if city == "Philadelphia" and "Restaurants" in categories and business_id:
+            restaurant_names[business_id] = business.get("name", "")
 
     # Step 4 + Step 5 + Step 6:
     # Stream through reviews, keep only matching businesses, and downsample
@@ -55,14 +48,14 @@ if __name__ == "__main__":
             business_id = review.get("business_id")
 
             # Keep only reviews for filtered Philadelphia restaurant businesses.
-            if business_id not in business_id_to_name:
+            if business_id not in restaurant_names:
                 continue
 
             seen_matching_reviews += 1
             row = {
                 "review_id": review.get("review_id", ""),
                 "business_id": business_id,
-                "business_name": business_id_to_name[business_id],
+                "business_name": restaurant_names[business_id],
                 "stars": review.get("stars", ""),
                 "date": review.get("date", ""),
                 "text": review.get("text", ""),
@@ -95,7 +88,5 @@ if __name__ == "__main__":
         writer.writeheader()
         writer.writerows(sampled_rows)
 
-    print(f"Filtered businesses: {len(business_id_to_name):,}")
-    print(f"Matching reviews seen: {seen_matching_reviews:,}")
-    print(f"Rows saved: {len(sampled_rows):,}")
-    print(f"Output written to: {output_path}")
+    print(f"Philadelphia restaurant businesses found: {len(restaurant_names):,}")
+    print(f"Reviews saved: {len(sampled_rows):,}")
