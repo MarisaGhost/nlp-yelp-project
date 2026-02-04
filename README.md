@@ -16,7 +16,7 @@ The main objectives of this project are:
 - Analyze which aspects (Food, Service, Price) are most associated with negative reviews
 - Produce interpretable, business-relevant insights
 
-This project was designed for an NLP course and emphasizes clarity, interpretability, and reproducibility.
+This project was designed for an INSY669
 
 ---
 
