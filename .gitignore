@@ -25,5 +25,8 @@ data/processed/
 # data files
 data/
 
+# local plot/font caches
+outputs/.mplconfig/
+outputs/.cache/
 
 

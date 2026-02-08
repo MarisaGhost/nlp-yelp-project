@@ -50,13 +50,18 @@ Key processed files:
   - Positive reviews (4–5 stars)
   - Negative reviews (1–2 stars)
 - 5 topics per split
+- Tuned vocabulary filtering (`filter_extremes`) per split
 - Topic coherence (c_v) reported
 
 ### Rating Prediction
-- TF-IDF features (unigrams + bigrams)
-- Logistic Regression with class balancing
+- Raw review text (minimal normalization)
+- Hybrid TF-IDF features:
+  - word n-grams (1-2)
+  - character n-grams (3-5, `char_wb`)
+- Linear SGD classifier (log-loss) with class balancing
+- Small validation split for model selection
 - 80/20 train-test split
-- Evaluation with accuracy and macro F1
+- Evaluation with accuracy, macro F1, weighted F1, confusion matrix
 - Word-level interpretability via model coefficients
 
 ### Aspect-Based Analysis
@@ -67,6 +72,7 @@ Key processed files:
   - Price
 - Comparison of mention rates in positive vs. negative reviews
 - Lift analysis (negative / positive mention rate)
+- Statistical significance testing (chi-square + odds ratio)
 - Optional VADER sentiment analysis for aspect-related reviews
 
 ---
@@ -74,8 +80,8 @@ Key processed files:
 ## Key Results
 
 - **Text-based model performance**
-  - Accuracy: ~0.59
-  - Macro F1: ~0.55
+  - Accuracy: ~0.65
+  - Macro F1: ~0.59
   - Significantly better than majority-class baseline
 
 - **Aspect insights**

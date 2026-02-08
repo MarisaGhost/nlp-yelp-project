@@ -16,7 +16,9 @@ Main data files used in this report:
 - `outputs/tables/top_features.csv`
 - `outputs/tables/lda_topics_positive.csv`
 - `outputs/tables/lda_topics_negative.csv`
+- `outputs/tables/lda_coherence.csv`
 - `outputs/tables/aspect_frequency.csv`
+- `outputs/tables/aspect_significance.csv`
 - `outputs/tables/aspect_sentiment.csv`
 
 ## 3) Methods
@@ -31,14 +33,18 @@ Main data files used in this report:
   - Positive reviews (stars 4-5)
   - Negative reviews (stars 1-2)
 - Settings: 5 topics per split, top 10 words per topic.
+- Vocabulary was filtered with split-specific thresholds (`filter_extremes`) to reduce noise and improve coherence.
 - Coherence (`c_v`) from the run:
-  - Positive: **0.3840**
-  - Negative: **0.3960**
+  - Positive: **0.4300**
+  - Negative: **0.4246**
 
 ### Rating Prediction
-- Task: predict star rating (1-5) from `cleaned_text`.
-- Features: TF-IDF with `max_features=5000`, `ngram_range=(1,2)`.
-- Model: Logistic Regression with balanced class weights.
+- Task: predict star rating (1-5) from raw review `text`.
+- Features: hybrid TF-IDF
+  - word n-grams (`ngram_range=(1,2)`)
+  - character n-grams (`char_wb`, `ngram_range=(3,5)`)
+- Model: linear SGD classifier (log-loss) with class balancing.
+- Model selection: validation split over multiple SGD settings; best model selected by validation macro F1.
 - Evaluation split: 80/20 train-test, `random_state=42`.
 
 ### Aspect Analysis
@@ -46,23 +52,26 @@ Main data files used in this report:
 - For positive and negative splits, I computed:
   - mention rate (% reviews mentioning an aspect at least once)
   - total mentions (count of matched seed words)
+- I ran chi-square tests and odds-ratio calculations to check whether aspect-rate gaps are statistically significant.
 - I also used VADER sentiment (optional extension) to compare average compound polarity for aspect-related reviews.
 
 ## 4) Results & Insights
 
 ### Classifier Performance
 From `outputs/tables/model_metrics.csv`:
-- **Accuracy = 0.5859**
-- **Macro F1 = 0.5459**
-- **Majority-class baseline accuracy = 0.4050**
+- **Accuracy = 0.6482**
+- **Macro F1 = 0.5949**
+- **Weighted F1 = 0.6430**
+- **Majority-class baseline accuracy = 0.4051**
 
 Interpretation:
 - The model clearly improves over baseline, so text features add predictive signal.
-- Performance is moderate rather than high, which is expected for 5-class sentiment intensity.
+- Compared with the earlier baseline (~0.586 accuracy, ~0.546 macro F1), this setup gives a meaningful lift.
 - Mid ratings (especially 2-4) are harder to separate than extreme ratings, as seen in the confusion matrix figure.
 
-Figure:
+Figures:
 - `outputs/figures/confusion_matrix.png`
+- `outputs/figures/confusion_matrix_normalized.png`
 
 ### Aspect Frequency and Lift
 From `outputs/tables/aspect_frequency.csv`, negative/positive mention-rate lift:
@@ -77,6 +86,10 @@ Interpretation:
 Figure:
 - `outputs/figures/aspect_mention_rate.png`
 
+From `outputs/tables/aspect_significance.csv`:
+- All three aspect differences are statistically significant at the 0.05 level.
+- Strongest over-representation in negative reviews is **Service** (odds ratio ~1.71, p-value ~8.17e-174).
+
 ### Optional Aspect Sentiment
 From `outputs/tables/aspect_sentiment.csv`:
 - Positive reviews mentioning aspects show high mean compound scores (~0.89-0.91).
@@ -84,7 +97,7 @@ From `outputs/tables/aspect_sentiment.csv`:
 - Service has one of the lowest sentiment levels on the negative side, consistent with complaint-driven reviews.
 
 ### LDA Topic Themes (Plain-Language Summary)
-From `outputs/tables/lda_topics_positive.csv` and `outputs/tables/lda_topics_negative.csv`:
+From `outputs/tables/lda_topics_positive.csv`, `outputs/tables/lda_topics_negative.csv`, and `outputs/tables/lda_coherence.csv`:
 - Positive topics emphasize words related to tasty food, friendly service, drinks, and overall good experience.
 - Negative topics emphasize waiting/order issues, customer-service friction, and dissatisfaction with taste/value.
 - Across both splits, recurring themes include service speed, ordering process, menu/food quality, and pricing/value perception.

@@ -1,58 +1,40 @@
-"""Simple visualization script for Yelp NLP project outputs."""
+"""Visualization script for Yelp NLP project outputs."""
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
+MPL_CACHE_DIR = Path("outputs/.mplconfig")
+MPL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("MPLCONFIGDIR", str(MPL_CACHE_DIR))
+XDG_CACHE_DIR = Path("outputs/.cache")
+XDG_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("XDG_CACHE_HOME", str(XDG_CACHE_DIR))
+
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
 
 
 if __name__ == "__main__":
-    # Step 0: Set paths and make sure output folder exists
-    data_path = Path("data/processed/reviews_processed.csv")
     tables_dir = Path("outputs/tables")
     figures_dir = Path("outputs/figures")
     figures_dir.mkdir(parents=True, exist_ok=True)
-
     sns.set_theme(style="whitegrid")
 
-    # Step 1: Build classifier again and save confusion matrix heatmap
-    print("Loading processed data for confusion matrix...")
-    df = pd.read_csv(data_path)
-    df = df[["cleaned_text", "stars"]].copy()
-    df = df.dropna(subset=["cleaned_text", "stars"])
-    df["stars"] = pd.to_numeric(df["stars"], errors="coerce")
-    df = df.dropna(subset=["stars"])
-    df["stars"] = df["stars"].astype(int)
-    df = df[df["stars"].isin([1, 2, 3, 4, 5])]
-    df["cleaned_text"] = df["cleaned_text"].astype(str)
+    # Step 1: Load confusion matrix from classifier outputs and plot heatmaps.
+    confusion_table_path = tables_dir / "confusion_matrix.csv"
+    if not confusion_table_path.exists():
+        raise FileNotFoundError(
+            f"Confusion matrix table not found: {confusion_table_path}. "
+            "Run python src/classifier.py first."
+        )
 
-    X = df["cleaned_text"]
-    y = df["stars"]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y,
-    )
-
-    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1, 2))
-    X_train_tfidf = vectorizer.fit_transform(X_train)
-    X_test_tfidf = vectorizer.transform(X_test)
-
-    model = LogisticRegression(max_iter=2000, class_weight="balanced")
-    model.fit(X_train_tfidf, y_train)
-    y_pred = model.predict(X_test_tfidf)
-
-    cm = confusion_matrix(y_test, y_pred, labels=[1, 2, 3, 4, 5])
+    cm_df = pd.read_csv(confusion_table_path, index_col=0)
+    labels = [int(c) for c in cm_df.columns]
+    cm = cm_df.to_numpy()
 
     plt.figure(figsize=(8, 6))
     sns.heatmap(
@@ -60,8 +42,8 @@ if __name__ == "__main__":
         annot=True,
         fmt="d",
         cmap="Blues",
-        xticklabels=[1, 2, 3, 4, 5],
-        yticklabels=[1, 2, 3, 4, 5],
+        xticklabels=labels,
+        yticklabels=labels,
     )
     plt.title("Confusion Matrix: Yelp Star Prediction")
     plt.xlabel("Predicted Label")
@@ -71,6 +53,30 @@ if __name__ == "__main__":
     plt.savefig(confusion_path, dpi=300)
     plt.close()
     print(f"Saved figure: {confusion_path}")
+
+    row_sums = cm.sum(axis=1, keepdims=True)
+    row_sums = np.where(row_sums == 0, 1, row_sums)
+    cm_normalized = cm / row_sums
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(
+        cm_normalized,
+        annot=True,
+        fmt=".2f",
+        cmap="Blues",
+        xticklabels=labels,
+        yticklabels=labels,
+        vmin=0.0,
+        vmax=1.0,
+    )
+    plt.title("Normalized Confusion Matrix (Row-wise)")
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    plt.tight_layout()
+    confusion_norm_path = figures_dir / "confusion_matrix_normalized.png"
+    plt.savefig(confusion_norm_path, dpi=300)
+    plt.close()
+    print(f"Saved figure: {confusion_norm_path}")
 
     # Step 2: Create aspect comparison bar chart and print lift
     print("Loading aspect frequency table...")

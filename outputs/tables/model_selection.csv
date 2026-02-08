@@ -1,0 +1,5 @@
+model_name,validation_accuracy,validation_macro_f1,word_max_features,char_max_features,char_ngram_range,min_df,loss,alpha,class_weight
+sgd_log_loss_balanced_alpha_3e-5_char35,0.64375,0.5963942985212085,100000,120000,"(3, 5)",3,log_loss,3e-05,balanced
+sgd_log_loss_balanced_alpha_4e-5_char25,0.6423333333333333,0.5952410177063447,120000,150000,"(2, 5)",3,log_loss,4e-05,balanced
+sgd_log_loss_unweighted_alpha_3e-5_char35,0.6369166666666667,0.5662042103107179,100000,120000,"(3, 5)",3,log_loss,3e-05,None
+sgd_modified_huber_balanced_alpha_1e-5_char35,0.5985,0.5543777137584911,100000,120000,"(3, 5)",3,modified_huber,1e-05,balanced

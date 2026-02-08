@@ -1,5 +1,13 @@
 metric,value
-accuracy,0.5858585858585859
-macro_f1,0.5459053274784917
-majority_baseline_accuracy,0.40504050405040504
-majority_class_from_train,5.0
+selected_model,sgd_log_loss_balanced_alpha_3e-5_char35
+selected_model_validation_macro_f1,0.5963942985212085
+selected_word_max_features,100000
+selected_char_max_features,120000
+selected_char_ngram_range,"(3, 5)"
+selected_alpha,3e-05
+selected_class_weight,balanced
+accuracy,0.64815
+macro_f1,0.5948607206424559
+weighted_f1,0.6429715603311219
+majority_baseline_accuracy,0.40505
+majority_class_from_train,5

@@ -1,41 +1,51 @@
 group,rank,word,score
-top_positive_words_for_class_5,1,delicious,17.2053252090692
-top_positive_words_for_class_5,2,amazing,14.54352346674638
-top_positive_words_for_class_5,3,great,13.547119930790153
-top_positive_words_for_class_5,4,good,12.7090959753941
-top_positive_words_for_class_5,5,love,10.764966991425782
-top_positive_words_for_class_5,6,awesome,10.559227043525507
-top_positive_words_for_class_5,7,excellent,10.420038245745882
-top_positive_words_for_class_5,8,perfect,10.193753343360033
-top_positive_words_for_class_5,9,favorite,9.631739756687633
-top_positive_words_for_class_5,10,fantastic,8.644395017695478
-top_positive_words_for_class_5,11,definitely,6.924290850636105
-top_positive_words_for_class_5,12,perfectly,6.806456650780571
-top_positive_words_for_class_5,13,incredible,6.452441129113806
-top_positive_words_for_class_5,14,friendly,6.34630851337262
-top_positive_words_for_class_5,15,wonderful,6.0029791555498875
-top_positive_words_for_class_5,16,gem,5.946146511358959
-top_positive_words_for_class_5,17,fresh,5.9268579680776
-top_positive_words_for_class_5,18,yummy,5.592675765513426
-top_positive_words_for_class_5,19,outstanding,5.469716015900056
-top_positive_words_for_class_5,20,nice,5.447936095887452
-top_negative_words_for_class_5,1,bad,-10.928394328126517
-top_negative_words_for_class_5,2,rude,-10.478500339488273
-top_negative_words_for_class_5,3,bland,-9.984394483258065
-top_negative_words_for_class_5,4,terrible,-9.385615697708886
-top_negative_words_for_class_5,5,horrible,-9.186574031740431
-top_negative_words_for_class_5,6,disappointed,-8.672273856406022
-top_negative_words_for_class_5,7,disappointing,-8.376537437545656
-top_negative_words_for_class_5,8,awful,-7.825161071857384
-top_negative_words_for_class_5,9,dry,-7.426021661893975
-top_negative_words_for_class_5,10,disgusting,-7.02653193150528
-top_negative_words_for_class_5,11,suck,-6.852187549901992
-top_negative_words_for_class_5,12,tasteless,-6.572915722961909
-top_negative_words_for_class_5,13,lack,-6.464785216395863
-top_negative_words_for_class_5,14,poor,-6.438802408232597
-top_negative_words_for_class_5,15,overpriced,-6.118543339993856
-top_negative_words_for_class_5,16,gross,-6.009187342499153
-top_negative_words_for_class_5,17,charge,-5.828926937727994
-top_negative_words_for_class_5,18,mediocre,-5.5668802299194375
-top_negative_words_for_class_5,19,salty,-5.5171207263749125
-top_negative_words_for_class_5,20,dirty,-5.460270373063236
+top_positive_words_for_class_5,1,best,6.146287432065291
+top_positive_words_for_class_5,2,great,5.069996236911541
+top_positive_words_for_class_5,3,amazing,4.779110666499216
+top_positive_words_for_class_5,4,the best,4.5146271160543625
+top_positive_words_for_class_5,5,so good,3.859419442909666
+top_positive_words_for_class_5,6,love,3.55690733290235
+top_positive_words_for_class_5,7,delicious,3.4730999749613796
+top_positive_words_for_class_5,8,awesome,2.8915161434489467
+top_positive_words_for_class_5,9,incredible,2.841758877921325
+top_positive_words_for_class_5,10,perfect,2.7559497164344124
+top_positive_words_for_class_5,11,excellent,2.7366407353517186
+top_positive_words_for_class_5,12,wait to,2.649727483435771
+top_positive_words_for_class_5,13,gem,2.6303220879401934
+top_positive_words_for_class_5,14,fantastic,2.5622921247671195
+top_positive_words_for_class_5,15,friendly,2.5266757719450594
+top_positive_words_for_class_5,16,every,2.4750729861189202
+top_positive_words_for_class_5,17,can wait,2.456902766002487
+top_positive_words_for_class_5,18,disappoint,2.4427651196159568
+top_positive_words_for_class_5,19,loved,2.373074359821502
+top_positive_words_for_class_5,20,favorite,2.317044367077724
+top_positive_words_for_class_5,21,love this,2.3125188007768664
+top_positive_words_for_class_5,22,not too,2.296602996481892
+top_positive_words_for_class_5,23,highly recommend,2.197336033041916
+top_positive_words_for_class_5,24,good,2.1823943412917224
+top_positive_words_for_class_5,25,try,2.1315077665297424
+top_negative_words_for_class_5,1,worst,-5.460634616418728
+top_negative_words_for_class_5,2,not,-5.1460706971522185
+top_negative_words_for_class_5,3,rude,-4.376034266202815
+top_negative_words_for_class_5,4,the worst,-3.403241681037171
+top_negative_words_for_class_5,5,bad,-3.3958358432688565
+top_negative_words_for_class_5,6,bland,-3.244179003484028
+top_negative_words_for_class_5,7,will never,-3.2429108858201254
+top_negative_words_for_class_5,8,never again,-3.1539457657889356
+top_negative_words_for_class_5,9,awful,-3.1419847332701787
+top_negative_words_for_class_5,10,one star,-3.077141759974614
+top_negative_words_for_class_5,11,terrible,-2.816829621807849
+top_negative_words_for_class_5,12,not worth,-2.8125007125986254
+top_negative_words_for_class_5,13,star,-2.7476783667060793
+top_negative_words_for_class_5,14,not good,-2.727804989707664
+top_negative_words_for_class_5,15,very disappointed,-2.5798046852904926
+top_negative_words_for_class_5,16,horrible,-2.541030404800062
+top_negative_words_for_class_5,17,money,-2.373375072622542
+top_negative_words_for_class_5,18,dry,-2.3578648494688315
+top_negative_words_for_class_5,19,never,-2.317075407653824
+top_negative_words_for_class_5,20,sucks,-2.3101539568919933
+top_negative_words_for_class_5,21,waste,-2.2563231237288046
+top_negative_words_for_class_5,22,gross,-2.2379193256830145
+top_negative_words_for_class_5,23,not recommend,-2.236805835130126
+top_negative_words_for_class_5,24,told,-2.206468026724979
+top_negative_words_for_class_5,25,poor,-2.1783333417931265
