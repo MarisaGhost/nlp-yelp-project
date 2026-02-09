@@ -1,126 +1,142 @@
 # Yelp NLP Project Report
 
-## 1) Background & Motivation
-Star ratings are useful, but they do not explain *why* customers feel positive or negative.  
-Review text gives richer signals about food quality, service behavior, wait time, and pricing concerns.  
-In this project, I used NLP methods to turn free-text Yelp reviews into interpretable insights for restaurant decision-making.
+## 1) Executive Summary
+This project converts unstructured Yelp reviews into operational insight for restaurant decision-making. It combines:
+- POS-filtered topic modeling for interpretable themes,
+- 5-class rating prediction from free text,
+- aspect-level statistical testing for Food, Service, and Price.
 
-## 2) Data
-I used the Yelp Academic Dataset and focused on restaurant businesses in Philadelphia.  
-The pipeline filters businesses to the restaurant category, merges reviews with business metadata, and builds a processed review table.  
-The project setup targets a sample size around 100k reviews for manageable modeling in class settings.
+Key outcomes from current outputs:
+- Rating prediction achieved **0.6482 accuracy** and **0.5949 macro F1** versus **0.4051 majority baseline** (`outputs/tables/model_metrics.csv`).
+- Service and price language are disproportionately concentrated in negative reviews (Service lift **1.1749**, Price lift **1.1594**) with strong significance (`outputs/tables/aspect_significance.csv`).
+- POS-filtered LDA coherence improved to **0.4851** (positive) and **0.4314** (negative) (`outputs/tables/lda_coherence.csv`).
 
-Main data files used in this report:
+## 2) Project Objective and Questions
+Objective: build a practical NLP workflow that identifies what customers discuss, what predicts star ratings, and which operational dimensions are most associated with dissatisfaction.
+
+Research questions:
+1. Which themes dominate positive vs negative restaurant experiences?
+2. Which aspects are overrepresented in negative reviews?
+3. How well can review text predict 1-5 star ratings?
+4. How can interpretable NLP outputs translate into manager-facing action?
+
+## 3) Data and Scope
+- Source: Yelp Academic Dataset
+- Scope: Philadelphia restaurant businesses
+- Size: approximately 100,000 reviews
+
+Primary artifacts:
 - `data/processed/reviews_processed.csv`
 - `outputs/tables/model_metrics.csv`
-- `outputs/tables/top_features.csv`
+- `outputs/tables/classification_report.csv`
 - `outputs/tables/lda_topics_positive.csv`
 - `outputs/tables/lda_topics_negative.csv`
 - `outputs/tables/lda_coherence.csv`
-- `outputs/tables/aspect_frequency.csv`
+- `outputs/tables/lda_topic3_comparison.csv`
+- `outputs/tables/lda_coherence_comparison.csv`
 - `outputs/tables/aspect_significance.csv`
-- `outputs/tables/aspect_sentiment.csv`
 
-## 3) Methods
+## 4) Methods
+### 4.1 Preprocessing and text channels
+`src/preprocess.py` builds two lemmatized representations with NLTK:
+- `cleaned_text`: normalized, stopword-filtered tokens.
+- `cleaned_text_topic_pos`: POS-filtered tokens for topic modeling.
 
-### Preprocessing
-- Input text: `cleaned_text` pipeline built from Yelp review text.
-- Steps: lowercase, remove URLs/emails, spaCy tokenization + lemmatization, remove stopwords/punctuation/numbers, keep alphabetic tokens.
-- Output columns include normalized text and tokenized forms for downstream analysis.
+POS filtering rules for topic modeling:
+- Keep nouns/proper nouns (`NN*`), adjectives (`JJ*`), and optional adverbs (`RB*`).
+- Lemmatize kept tokens with WordNet lemmatization.
+- Remove stopwords and non-alphabetic tokens.
 
-### Topic Modeling
-- I trained separate LDA models for:
-  - Positive reviews (stars 4-5)
-  - Negative reviews (stars 1-2)
-- Settings: 5 topics per split, top 10 words per topic.
-- Vocabulary was filtered with split-specific thresholds (`filter_extremes`) to reduce noise and improve coherence.
-- Coherence (`c_v`) from the run:
-  - Positive: **0.4300**
-  - Negative: **0.4246**
+### 4.2 Topic modeling
+`src/topics.py` trains split LDA models:
+- Positive split: stars 4-5
+- Negative split: stars 1-2
+- Topics per split: 5
+- Top words per topic: 10
+- Coherence metric: `c_v`
 
-### Rating Prediction
-- Task: predict star rating (1-5) from raw review `text`.
-- Features: hybrid TF-IDF
-  - word n-grams (`ngram_range=(1,2)`)
-  - character n-grams (`char_wb`, `ngram_range=(3,5)`)
-- Model: linear SGD classifier (log-loss) with class balancing.
-- Model selection: validation split over multiple SGD settings; best model selected by validation macro F1.
-- Evaluation split: 80/20 train-test, `random_state=42`.
+The script also writes evaluation artifacts:
+- `outputs/tables/lda_topic3_comparison.csv` (before vs after POS filtering)
+- `outputs/tables/lda_coherence_comparison.csv` (coherence deltas)
+- `outputs/pos_filter_evaluation.md`
 
-### Aspect Analysis
-- Seed-word method for three aspects: **Food, Service, Price**.
-- For positive and negative splits, I computed:
-  - mention rate (% reviews mentioning an aspect at least once)
-  - total mentions (count of matched seed words)
-- I ran chi-square tests and odds-ratio calculations to check whether aspect-rate gaps are statistically significant.
-- I also used VADER sentiment (optional extension) to compare average compound polarity for aspect-related reviews.
+### 4.3 Rating prediction
+`src/classifier.py` uses raw review text with hybrid TF-IDF features:
+- word n-grams `(1, 2)`
+- character n-grams `char_wb (3, 5)`
 
-## 4) Results & Insights
+Classifier: `SGDClassifier` with validation-based selection.
 
-### Classifier Performance
+### 4.4 Aspect significance
+`src/aspects.py` computes mention-rate differences and significance for Food, Service, Price:
+- lift (negative over positive)
+- odds ratio
+- chi-square p-value
+
+## 5) Results
+### 5.1 Classification quality
 From `outputs/tables/model_metrics.csv`:
-- **Accuracy = 0.6482**
-- **Macro F1 = 0.5949**
-- **Weighted F1 = 0.6430**
-- **Majority-class baseline accuracy = 0.4051**
+- Accuracy: **0.64815**
+- Macro F1: **0.59486**
+- Weighted F1: **0.64297**
+- Majority baseline accuracy: **0.40505**
 
-Interpretation:
-- The model clearly improves over baseline, so text features add predictive signal.
-- Compared with the earlier baseline (~0.586 accuracy, ~0.546 macro F1), this setup gives a meaningful lift.
-- Mid ratings (especially 2-4) are harder to separate than extreme ratings, as seen in the confusion matrix figure.
+From `outputs/tables/classification_report.csv`:
+- Class 1 F1: **0.7244**
+- Class 2 F1: **0.4134**
+- Class 3 F1: **0.5065**
+- Class 4 F1: **0.5492**
+- Class 5 F1: **0.7808**
 
-Figures:
-- `outputs/figures/confusion_matrix.png`
-- `outputs/figures/confusion_matrix_normalized.png`
+Interpretation: extreme sentiment classes are easier to identify than middle ratings.
 
-### Aspect Frequency and Lift
-From `outputs/tables/aspect_frequency.csv`, negative/positive mention-rate lift:
-- **Service lift ~1.175**
-- **Price lift ~1.159**
-- **Food lift ~0.921** (used as a baseline-style reference aspect)
-
-Interpretation:
-- Service and price are discussed relatively more in negative reviews.
-- Food appears heavily in both splits, but proportionally less dominant in negatives than service/price.
-
-Figure:
-- `outputs/figures/aspect_mention_rate.png`
-
+### 5.2 Aspect-level risk signals
 From `outputs/tables/aspect_significance.csv`:
-- All three aspect differences are statistically significant at the 0.05 level.
-- Strongest over-representation in negative reviews is **Service** (odds ratio ~1.71, p-value ~8.17e-174).
+- Service: lift **1.1749**, odds ratio **1.7053**, p-value **8.17e-174**
+- Price: lift **1.1594**, odds ratio **1.2833**, p-value **1.74e-48**
+- Food: lift **0.9212**, odds ratio **0.6300**, p-value **1.15e-105**
 
-### Optional Aspect Sentiment
-From `outputs/tables/aspect_sentiment.csv`:
-- Positive reviews mentioning aspects show high mean compound scores (~0.89-0.91).
-- Negative reviews mentioning aspects are much lower (~0.26-0.36).
-- Service has one of the lowest sentiment levels on the negative side, consistent with complaint-driven reviews.
+Interpretation: service and value language are the strongest dissatisfaction indicators in this dataset.
 
-### LDA Topic Themes (Plain-Language Summary)
-From `outputs/tables/lda_topics_positive.csv`, `outputs/tables/lda_topics_negative.csv`, and `outputs/tables/lda_coherence.csv`:
-- Positive topics emphasize words related to tasty food, friendly service, drinks, and overall good experience.
-- Negative topics emphasize waiting/order issues, customer-service friction, and dissatisfaction with taste/value.
-- Across both splits, recurring themes include service speed, ordering process, menu/food quality, and pricing/value perception.
+### 5.3 Topic modeling with POS filtering
+From `outputs/tables/lda_coherence.csv`:
+- Positive coherence `c_v`: **0.4851**
+- Negative coherence `c_v`: **0.4314**
 
-Figures:
-- Positive topic bars: `outputs/figures/lda_positive_topic_0.png` to `outputs/figures/lda_positive_topic_4.png`
-- Negative topic bars: `outputs/figures/lda_negative_topic_0.png` to `outputs/figures/lda_negative_topic_4.png`
+From `outputs/tables/lda_coherence_comparison.csv`:
+- Positive coherence delta: **+0.0551**
+- Negative coherence delta: **+0.0069**
 
-## 5) Limitations
-- Seed-word aspect analysis depends on manual keyword choices and can miss synonyms/context.
-- LDA topics are useful summaries but not perfectly interpretable; topic labels are subjective.
-- The analysis is city-specific (Philadelphia), so patterns may not generalize to other markets.
-- Text-only modeling ignores useful metadata (user history, business attributes, time effects).
+From `outputs/tables/lda_topic3_comparison.csv`:
+- Positive Topic 3 before: `coffee, breakfast, brunch, egg, cream, toast, sweet, french, tea, chocolate`
+- Positive Topic 3 after: `bar, drink, beer, night, table, happy, hour, great, selection, friend`
+- Negative Topic 3 before: `come, table, wait, service, ask, drink, time, order, minute, go`
+- Negative Topic 3 after: `cheese, sandwich, good, fry, chicken, burger, salad, order, place, time`
 
-## 6) Business Recommendations
-- Prioritize service operations (speed, staff responsiveness, order accuracy), since service terms are overrepresented in negative feedback.
-- Monitor pricing/value perception closely (especially words like overpriced/charge/value) and align portion/quality with price expectations.
-- Use food-related positive terms (e.g., delicious, fresh, favorite) in marketing language and menu highlights.
-- Track aspect mention rates monthly to detect early shifts in complaint patterns before ratings drop.
-- Combine model predictions with manual review sampling for high-risk reviews to improve actionability.
+Interpretation:
+- POS-filtering reduced narrative verb presence in negative Topic 3 and increased descriptor/entity concentration.
+- Topic vocabulary became more sharply thematic, with improved coherence on both splits.
 
-## 7) Reproducibility
-Run the pipeline scripts in order:
+## 6) Operational Implications
+- Prioritize service-reliability interventions (wait-time, order handling, staff communication).
+- Treat price/value messaging as second-priority risk mitigation.
+- Use topic tables and model features together for weekly triage and root-cause tracking.
+- Keep middle-rating reviews under targeted review because they remain the hardest prediction segment.
+
+## 7) Limitations
+- Aspect seed words are interpretable but may miss synonyms/context.
+- LDA topic labels still require human interpretation.
+- Findings are Philadelphia-focused and may not generalize without revalidation.
+- Results are predictive/associative, not causal.
+
+## 8) Reproducibility
+Run the complete workflow:
+
+```bash
+python main.py
+```
+
+Or run step-by-step:
 
 ```bash
 python src/data_loader.py
@@ -130,5 +146,3 @@ python src/classifier.py
 python src/aspects.py
 python src/visualize.py
 ```
-
-Or run a single orchestrator script if you maintain one (for example, `python main.py`).

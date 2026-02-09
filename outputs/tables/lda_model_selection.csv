@@ -1,3 +1,3 @@
-split,config_name,passes,alpha,eta,filter_extremes,dictionary_size,coherence_c_v
-positive,filtered_soft_alpha_auto,12,auto,None,"{'no_below': 20, 'no_above': 0.5, 'keep_n': 50000}",6502,0.43001056050767694
-negative,filtered_strict_eta_auto,15,symmetric,auto,"{'no_below': 30, 'no_above': 0.45, 'keep_n': 40000}",2599,0.42457026204200987
+split,config_name,passes,alpha,eta,filter_extremes,dictionary_size,coherence_c_v,input_column
+positive,filtered_soft_alpha_auto,12,auto,None,"{'no_below': 20, 'no_above': 0.5, 'keep_n': 50000}",5800,0.48507072861790573,cleaned_text_topic_pos
+negative,filtered_strict_eta_auto,15,symmetric,auto,"{'no_below': 30, 'no_above': 0.45, 'keep_n': 40000}",2193,0.43142586054269483,cleaned_text_topic_pos
