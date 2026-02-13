@@ -37,7 +37,8 @@ Core processed files:
 - Evaluate with coherence `c_v`.
 
 ### 3) Document Classification
-- Predict 1-5 stars from raw review text.
+- Primary task: binary triage from raw review text (1-2 stars = negative, 4-5 stars = positive; 3-star excluded).
+- Secondary task: exploratory 5-class prediction baseline (1-5 stars).
 - Hybrid TF-IDF features:
 - word n-grams (1,2)
 - character n-grams (`char_wb`, 3-5)
@@ -49,11 +50,18 @@ Core processed files:
 - Compute lift, odds ratio, and chi-square significance.
 
 ## Current Results
-From `outputs/tables/model_metrics.csv`:
-- Accuracy: **0.6482**
-- Macro F1: **0.5949**
-- Weighted F1: **0.6430**
-- Majority baseline accuracy: **0.4051**
+Primary model result (from `outputs/report.md` section 5.2):
+- Task: binary triage (1-2 stars = negative, 4-5 stars = positive, 3-star excluded)
+- SGDClassifier validation accuracy: **0.95470**
+- Naive Bayes (ComplementNB) validation accuracy: **0.93335**
+- KNN (`n_neighbors=5`, cosine) validation accuracy: **0.87241**
+- Best tuned SGD result: **0.95470** (`loss='hinge'`, `alpha=1e-4`)
+
+Secondary baseline (exploratory 5-class) from `outputs/tables/model_metrics.csv`:
+- Accuracy: **0.64815**
+- Macro F1: **0.59486**
+- Weighted F1: **0.64297**
+- Majority baseline accuracy: **0.40505**
 
 From `outputs/tables/aspect_significance.csv`:
 - Service lift (negative/positive): **1.1749**, odds ratio: **1.7053**
@@ -86,6 +94,7 @@ nlp-yelp-project/
 |   |-- topics.py
 |   |-- classifier.py
 |   |-- aspects.py
+|   |-- compare_models.py
 |   `-- visualize.py
 |-- main.py
 |-- README.md
@@ -122,6 +131,36 @@ python src/classifier.py
 python src/aspects.py
 python src/visualize.py
 ```
+
+### 5) Primary Model Result (Binary Triage Accuracy)
+This is the primary modeling result described in `outputs/report.md` section 5.2.
+We compare three models on the same TF-IDF features (word n-grams 1-2, `min_df=5`, lowercase) using one 80/20 train/validation split (`random_state=42`).
+
+Operational setup used in this comparison:
+- Binary target: `negative` (1-2 stars) vs `positive` (4-5 stars)
+- 3-star reviews are excluded as neutral/mixed feedback for triage use-cases
+
+Models:
+- `SGDClassifier`
+- `ComplementNB` (Naive Bayes)
+- `KNeighborsClassifier`
+
+Run:
+```bash
+python -m src.compare_models
+```
+
+Results are saved to:
+- `outputs/tables/model_accuracy.csv`
+- `outputs/tables/best_model_tuning.csv`
+
+Current validation accuracy snapshot:
+
+| Model | Accuracy |
+|---|---:|
+| SGDClassifier | 0.95470 |
+| Naive Bayes (ComplementNB) | 0.93335 |
+| KNN | 0.87241 |
 
 ## Outputs
 - Tables: `outputs/tables/`

@@ -1,0 +1,2 @@
+model_name,validation_accuracy,best_params,notes
+sgd,0.9547002135149172,"{""alpha"": 0.0001, ""loss"": ""hinge""}",tiny grid over loss + alpha

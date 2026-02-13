@@ -7,7 +7,8 @@ This project converts unstructured Yelp reviews into operational insight for res
 - aspect-level statistical testing for Food, Service, and Price.
 
 Key outcomes from current outputs:
-- Rating prediction achieved **0.6482 accuracy** and **0.5949 macro F1** versus **0.4051 majority baseline** (`outputs/tables/model_metrics.csv`).
+- 5-class rating prediction baseline achieved **0.6482 accuracy** and **0.5949 macro F1** versus **0.4051 majority baseline** (`outputs/tables/model_metrics.csv`).
+- Operational binary triage (1-2 vs 4-5, excluding 3-star) reached **0.9547 validation accuracy** (`outputs/tables/model_accuracy.csv`).
 - Service and price language are disproportionately concentrated in negative reviews (Service lift **1.1749**, Price lift **1.1594**) with strong significance (`outputs/tables/aspect_significance.csv`).
 - POS-filtered LDA coherence improved to **0.4851** (positive) and **0.4314** (negative) (`outputs/tables/lda_coherence.csv`).
 
@@ -74,8 +75,10 @@ Classifier: `SGDClassifier` with validation-based selection.
 - chi-square p-value
 
 ## 5) Results
-### 5.1 Classification quality
-From `outputs/tables/model_metrics.csv`:
+### 5.1 Exploratory / secondary baseline: 5-class rating prediction
+We experimented with 5-class star prediction as an exploratory baseline. However, adjacent ratings (for example, 2 vs 3 vs 4) are often semantically ambiguous in user-generated reviews. To better align with interpretability and operational usefulness, the primary modeling result in this report is binary triage (1-2 vs 4-5), excluding 3-star reviews.
+
+From `outputs/tables/model_metrics.csv` (exploratory / secondary baseline):
 - Accuracy: **0.64815**
 - Macro F1: **0.59486**
 - Weighted F1: **0.64297**
@@ -88,20 +91,37 @@ From `outputs/tables/classification_report.csv`:
 - Class 4 F1: **0.5492**
 - Class 5 F1: **0.7808**
 
-Interpretation: extreme sentiment classes are easier to identify than middle ratings.
+Interpretation: this baseline is kept for completeness, but adjacent star ambiguity limits direct actionability.
 
-### 5.2 Aspect-level risk signals
+### 5.2 Primary model result: binary triage accuracy and tuning
+We ran a simple comparison in `src/compare_models.py`.
+This is a separate topic from the 5-class baseline above.
+All three models used the same TF-IDF setup: word n-grams `(1,2)`, `min_df=5`, lowercase, and one 80/20 split (`random_state=42`).
+Target definition for this section: 1-2 stars = negative, 4-5 stars = positive, with 3-star reviews excluded.
+Reason for excluding 3-star in business senarios: 3-star reviews are usually mixed/neutral and less action-prioritized than clear detractor/promoter signals.
+For service recovery and alerting, teams typically need a clear "risk vs healthy" signal first.
+Validation accuracy results (`outputs/tables/model_accuracy.csv`):
+- SGDClassifier: **0.95470**
+- Naive Bayes (ComplementNB): **0.93335**
+- KNN (`n_neighbors=5`, cosine): **0.87241**
+The best base model was SGDClassifier, so we ran a tiny sweep over `loss in ['hinge', 'log_loss']` and `alpha in [1e-4, 1e-3, 1e-2]`.
+Best tuned result (`outputs/tables/best_model_tuning.csv`): **0.95470** with `loss='hinge'` and `alpha=1e-4`, which indicates fine turning didn't improve accuracy, so our model may reached to a top performance already.
+
+### 5.3 Aspect-level risk signals
 From `outputs/tables/aspect_significance.csv`:
 - Service: lift **1.1749**, odds ratio **1.7053**, p-value **8.17e-174**
+- Operationally, this Service lift suggests dissatisfaction is often tied to wait-time and order-handling, motivating better peak-hour staffing and tighter service workflows.
 - Price: lift **1.1594**, odds ratio **1.2833**, p-value **1.74e-48**
 - Food: lift **0.9212**, odds ratio **0.6300**, p-value **1.15e-105**
 
-Interpretation: service and value language are the strongest dissatisfaction indicators in this dataset.
+Interpretation: Service and Price are the strongest dissatisfaction indicators in this dataset.
 
-### 5.3 Topic modeling with POS filtering
+### 5.4 Topic modeling with POS filtering
 From `outputs/tables/lda_coherence.csv`:
 - Positive coherence `c_v`: **0.4851**
 - Negative coherence `c_v`: **0.4314**
+
+POS filtering was treated as a controlled preprocessing improvement step and validated with coherence. Compared with the no-POS baseline, coherence changed by **+0.0551** (positive) and **+0.0069** (negative), suggesting more semantically consistent topics.
 
 From `outputs/tables/lda_coherence_comparison.csv`:
 - Positive coherence delta: **+0.0551**
@@ -146,3 +166,4 @@ python src/classifier.py
 python src/aspects.py
 python src/visualize.py
 ```
+

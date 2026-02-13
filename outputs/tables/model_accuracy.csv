@@ -1,0 +1,4 @@
+model_name,accuracy,notes
+sgd,0.9547002135149172,default SGDClassifier
+naive_bayes,0.9333487217958336,ComplementNB
+knn,0.8724104102948814,"KNeighborsClassifier(n_neighbors=5, metric=cosine)"
