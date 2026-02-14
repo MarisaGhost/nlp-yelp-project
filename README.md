@@ -49,6 +49,13 @@ Core processed files:
 - Compare mention rates by split.
 - Compute lift, odds ratio, and chi-square significance.
 
+### 5) Extended Binary Experimentation
+- Run broader hyperparameter grid search for binary triage.
+- Report 5-fold cross-validation metrics.
+- Export holdout confusion matrix and ROC-AUC.
+- Save error-analysis samples (false positives/false negatives).
+- Run ablation study across `word_only`, `char_only`, and `hybrid` features.
+
 ## Current Results
 Primary model result (from `outputs/report.md` section 5.2):
 - Task: binary triage (1-2 stars = negative, 4-5 stars = positive, 3-star excluded)
@@ -94,12 +101,27 @@ nlp-yelp-project/
 |   |-- topics.py
 |   |-- classifier.py
 |   |-- aspects.py
+|   |-- experimentation_binary.py
 |   |-- compare_models.py
 |   `-- visualize.py
+|-- Makefile
 |-- main.py
 |-- README.md
 `-- requirements.txt
 ```
+
+## Run with Makefile (Recommended)
+```bash
+make help
+```
+
+Common targets:
+- `make install` install dependencies from `requirements.txt`
+- `make pipeline` run full pipeline (including extended binary experimentation)
+- `make pipeline_no_experiment` run full pipeline without extended binary experimentation
+- `make experiment` run only extended binary experimentation (CV/AUC/confusion matrix/error analysis/ablation)
+- `make compare` run binary model comparison + tiny tuning (`compare_models.py`)
+- `make report` run `main.py` full pipeline
 
 ## Reproduce
 ### 1) Environment
@@ -119,7 +141,7 @@ Place these files in `data/raw/`:
 
 ### 3) Run full pipeline
 ```bash
-python main.py
+make pipeline
 ```
 
 ### 4) Run step-by-step
@@ -129,6 +151,7 @@ python src/preprocess.py
 python src/topics.py
 python src/classifier.py
 python src/aspects.py
+python src/experimentation_binary.py
 python src/visualize.py
 ```
 
@@ -147,7 +170,7 @@ Models:
 
 Run:
 ```bash
-python -m src.compare_models
+make compare
 ```
 
 Results are saved to:
@@ -164,6 +187,7 @@ Current validation accuracy snapshot:
 
 ## Outputs
 - Tables: `outputs/tables/`
+- Key extended experimentation tables: `binary_hyperparameter_grid.csv`, `binary_cv_metrics.csv`, `binary_cv_summary.csv`, `binary_holdout_metrics.csv`, `binary_confusion_matrix.csv`, `binary_error_analysis_examples.csv`, `binary_ablation.csv`
 - Figures: `outputs/figures/`
 - Evaluation note: `outputs/pos_filter_evaluation.md`
 - Final write-up: `outputs/report.md`
